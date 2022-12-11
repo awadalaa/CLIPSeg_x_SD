@@ -1,3 +1,4 @@
+import os
 from diffusers import StableDiffusionInpaintPipeline
 from transformers import CLIPSegProcessor, CLIPSegForImageSegmentation
 import gradio as gr
@@ -8,7 +9,14 @@ import cv2
 
 clip_seg_processor = CLIPSegProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
 clip_seg_model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined")
-sd_inpainting_model = StableDiffusionInpaintPipeline.from_pretrained("stable-diffusion-2-inpainting", revision="fp16", torch_dtype=torch.float16)
+auth_token = os.environ.get("HF_TOKEN") or True
+sd_inpainting_model = StableDiffusionInpaintPipeline.from_pretrained(
+  "stable-diffusion-2-inpainting",
+  revision="fp16",
+  torch_dtype=torch.float32,
+  use_auth_token=auth_token
+)
+sd_inpainting_model.scheduler = DPMSolverMultistepScheduler.from_config(sd_inpainting_model.scheduler.config)
 
 
 def process_image(image, prompt1, prompt2):
