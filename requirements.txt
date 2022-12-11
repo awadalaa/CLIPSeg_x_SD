@@ -1,5 +1,7 @@
-git+https://github.com/huggingface/transformers.git
 accelerate
-git+https://github.com/huggingface/diffusers.git
+diffusers
 torch
 opencv-python
+transformers
+accelerate
+scipy
