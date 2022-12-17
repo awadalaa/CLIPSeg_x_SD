@@ -12,21 +12,17 @@ license: mit
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
 
+# CLIPSeg X SD
 
-It takes 3 mandatory inputs.
-
-Input Image URL
-Prompt of the part in the input image that you want to replace
-Output Prompt
-There are certain parameters that you can tune
-
-Mask Precision
-Stable Diffusion Generation Strength
+work in progress. Currently it just performs image segmentation but planning to add stable diffusion in painting to the segmented image.
 
 
+## Demo
 
-Prerequisites:
+https://huggingface.co/spaces/alaaawad/CLIPSeg_x_SD
+
+
+## Prerequisites:
 * GPU (runs fine on Google Colab Tesla T4)
+* Clipseg Model Weights - https://github.com/timojl/clipseg
 
-
-Clipseg Model Weights - https://github.com/timojl/clipseg
