@@ -7,11 +7,17 @@ import torch
 import matplotlib.pyplot as plt
 import cv2
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+auth_token = os.environ.get("HF_TOKEN") or True
 clip_seg_processor = CLIPSegProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
 clip_seg_model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined")
+sd_inpainting_pipe = StableDiffusionInpaintPipeline.from_pretrained("runwayml/stable-diffusion-inpainting", revision="fp16", torch_dtype=torch.float16, use_auth_token=auth_token).to(device)
 
-def process_image(image, prompt):
-  inputs = clip_seg_processor(text=prompt, images=image, padding="max_length", return_tensors="pt")
+
+def process_image(image, prompt_find, prompt_replace):
+  inputs = clip_seg_processor(text=prompt_find, images=image, padding="max_length", return_tensors="pt")
 
   # predict
   with torch.no_grad():
@@ -22,7 +28,9 @@ def process_image(image, prompt):
   plt.imsave(filename_mask, torch.sigmoid(preds))
   mask_image = Image.open(filename_mask).convert("RGB")
 
-  return mask_image
+  image = sd_inpainting_pipe(prompt=prompt_replace, image=image, mask_image=mask_image).images[0]
+
+  return mask_image,image
 
 
 
@@ -36,8 +44,10 @@ interface = gr.Interface(fn=process_image,
                      inputs=[
                         gr.Image(type="pil"),
                         gr.Textbox(label="What to identify"),
+                        gr.Textbox(label="What to replace"),
                       ],
                      outputs=[
+                        gr.Image(type="pil"),
                         gr.Image(type="pil"),
                      ],
                      title=title,
